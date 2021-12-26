@@ -1,0 +1,9 @@
+.vs/**
+concurrentstruct.sln
+concurrentstruct/**.vcxproj
+concurrentstruct/**.vcxproj.**
+concurrentstruct/bin/**
+concurrentstruct/obj/**
+concurrenttest/**
+packages/**
+x64/**

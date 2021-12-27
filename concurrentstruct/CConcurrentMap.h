@@ -16,7 +16,7 @@ template <typename _Key, typename _Tp> class CMapNode {
 public:
 	CMapNode();
 	CMapNode(const  CMapNode&) = delete;
-	CMapNode& operator=(const CMapNode&);
+	CMapNode& operator=(const CMapNode&)=delete;
 	_Tp& put(const _Key, const _Tp);
 	const _Tp* get(const _Key&);
 };

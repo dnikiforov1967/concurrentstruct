@@ -34,7 +34,7 @@ _Tp& CMapNode<_Key, _Tp>::put(const _Key key, const _Tp val) {
 template <typename _Key, typename _Tp> 
 const _Tp* CMapNode<_Key, _Tp>::get(const _Key& key) {
 	const std::lock_guard<std::mutex> lock(this->mutex_);
-	const _Tp* ptr;
+	const _Tp* ptr = nullptr;
 	if (auto found = _storage.find(key); found != _storage.end())
 		ptr = &(found->second);
 	return ptr;

@@ -38,7 +38,7 @@ namespace util {
 	
 	template <typename _Key, typename _Compare> const _Key* map_node< _Key, _Compare>::get(const _Key& key) {
 		const std::lock_guard<std::mutex> lock(this->mutex_);
-		const int* ptr = nullptr;
+		const _Key* ptr = nullptr;
 		if (auto found = _storage.find(key); found != _storage.end())
 			ptr = &(*found);
 		return ptr;

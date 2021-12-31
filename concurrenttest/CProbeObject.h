@@ -9,5 +9,10 @@ struct CProbeObject
 			return lhs.id < rhs.id;
 		}
 	};
+	struct hash {
+		std::size_t operator()(const CProbeObject& o) noexcept {
+			return std::hash<int>{}(o.id);
+		}
+	};
 };
 

@@ -100,8 +100,8 @@ namespace util {
 		typename _Hash
 	>
 	const _Key* concurrent_hash_map<_Key, _Compare, _Hash>::put(const _Key& key) {
-		int backet = _Hash()(key) % hash_buckets;
-		std::unique_ptr<map_node<int>> &ptr = vector_[std::abs(backet)];
+		int backet = _Hash{}(key) % hash_buckets;
+		std::unique_ptr<map_node<_Key, _Compare>> &ptr = vector_[std::abs(backet)];
 		return ptr.get()->put(key);
 	}
 
@@ -111,8 +111,8 @@ namespace util {
 		typename _Hash
 	>
 	const _Key* concurrent_hash_map<_Key, _Compare, _Hash>::get(const _Key& key) {
-		int backet = _Hash()(key) % hash_buckets;
-		std::unique_ptr<map_node<int>>& ptr = vector_[std::abs(backet)];
+		int backet = _Hash{}(key) % hash_buckets;
+		std::unique_ptr<map_node<_Key, _Compare>>& ptr = vector_[std::abs(backet)];
 		return ptr.get()->get(key);
 	}
 

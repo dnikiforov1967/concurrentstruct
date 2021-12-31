@@ -33,3 +33,14 @@ TEST(ConcurrentHashMapTestCase, PutTest) {
 	const int *r = chm.get(3);
 	EXPECT_EQ(*r, 3);
 }
+
+TEST(ConcurrentHashMapTestCase, PutAndGetComplexObjectTest) {
+	CProbeObject key1{ 3, "ABC" };
+	CProbeObject key2{ 4, "DEF" };
+	CProbeObject key_probe{ 4, "???" };
+	concurrent_hash_map<CProbeObject, CProbeObject::less, CProbeObject::hash> chm;
+	chm.put(key1);
+	chm.put(key2);
+	auto r = chm.get(key_probe);
+	EXPECT_EQ(r->name, key2.name);
+}

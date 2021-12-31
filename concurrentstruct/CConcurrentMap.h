@@ -8,13 +8,13 @@ Author D.Nikiforov, 12.2021
 #define _CONCURRENT_MAP_
 
 #include <set>
-#include <mutex>
+#include <shared_mutex>
 #include <unordered_map>
 
 namespace util {
 
 	template <typename _Key, typename _Compare = std::less<_Key>> class map_node {
-		std::mutex mutex_;
+		std::shared_mutex mutex_;
 		std::set<_Key, _Compare> _storage;
 		public:
 			map_node();
@@ -29,7 +29,7 @@ namespace util {
 
 
 	template <typename _Key, typename _Compare> const _Key* map_node< _Key, _Compare>::put(const _Key& key) {
-		const std::lock_guard<std::mutex> lock(mutex_);
+		const std::lock_guard<std::shared_mutex> lock(mutex_);
 		_storage.emplace(key);
 		auto found = _storage.find(key);
 		return &(*found);
@@ -37,7 +37,7 @@ namespace util {
 
 	
 	template <typename _Key, typename _Compare> const _Key* map_node< _Key, _Compare>::get(const _Key& key) {
-		const std::lock_guard<std::mutex> lock(this->mutex_);
+		const std::shared_lock<std::shared_mutex> lock(this->mutex_);
 		const _Key* ptr = nullptr;
 		if (auto found = _storage.find(key); found != _storage.end())
 			ptr = &(*found);

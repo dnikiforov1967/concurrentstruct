@@ -44,3 +44,15 @@ TEST(ConcurrentHashMapTestCase, PutAndGetComplexObjectTest) {
 	auto r = chm.get(key_probe);
 	EXPECT_EQ(r->name, key2.name);
 }
+
+TEST(ConcurrentHashMapTestCase, PutDoubledObjectTest) {
+	CProbeObject key1{ 3, "ABC" };
+	CProbeObject key2{ 3, "DEF" };
+	CProbeObject key_probe{ 3, "???" };
+	concurrent_hash_map<CProbeObject, CProbeObject::less, CProbeObject::hash> chm;
+	auto a = chm.put(key1);
+	auto b = chm.put(key2);
+	EXPECT_EQ(b->name, a->name);
+	auto r = chm.get(key_probe);
+	EXPECT_EQ(r->name, key1.name);
+}

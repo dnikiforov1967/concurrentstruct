@@ -50,9 +50,12 @@ namespace util {
 		typename _Hash = std::hash<_Key>
 	>
 	class concurrent_hash_map {
+		using element_t = std::unique_ptr<map_node<_Key, _Compare>>;
 		std::size_t hash_buckets;
-		std::vector<std::unique_ptr<map_node<_Key, _Compare>>> vector_;
+		std::vector<element_t> vector_;
 		void initialize();
+		decltype(auto) find_bucket(const _Key&);
+
 	public:
 		concurrent_hash_map();
 		concurrent_hash_map(std::size_t hash_buckets);
@@ -71,7 +74,7 @@ namespace util {
 		map_node<_Key, _Compare> *node_ = nullptr;
 		for (auto i = 0; i < hash_buckets; i++) {
 			node_ = new map_node<_Key, _Compare>();
-			auto uptr_ = std::unique_ptr<map_node<_Key, _Compare>>(node_);
+			auto uptr_ = element_t(node_);
 			vector_.push_back(std::move(uptr_));
 		}
 	}
@@ -99,9 +102,19 @@ namespace util {
 		typename _Compare,
 		typename _Hash
 	>
-	const _Key* concurrent_hash_map<_Key, _Compare, _Hash>::put(const _Key& key) {
+	decltype(auto) concurrent_hash_map<_Key, _Compare, _Hash>::find_bucket(const _Key& key) {
 		auto backet = static_cast<int>(_Hash{}(key) % hash_buckets);
-		auto& ptr = vector_[std::abs(backet)];
+		decltype(auto) ptr = vector_[std::abs(backet)];
+		return ptr;
+	}
+
+	template <
+		typename _Key,
+		typename _Compare,
+		typename _Hash
+	>
+	const _Key* concurrent_hash_map<_Key, _Compare, _Hash>::put(const _Key& key) {
+		decltype(auto) ptr = find_bucket(key);
 		return ptr.get()->put(key);
 	}
 
@@ -111,8 +124,7 @@ namespace util {
 		typename _Hash
 	>
 	const _Key* concurrent_hash_map<_Key, _Compare, _Hash>::get(const _Key& key) {
-		auto backet = static_cast<int>(_Hash{}(key) % hash_buckets);
-		auto& ptr = vector_[std::abs(backet)];
+		decltype(auto) ptr = find_bucket(key);
 		return ptr.get()->get(key);
 	}
 

@@ -14,21 +14,22 @@ Author D.Nikiforov, 12.2021
 namespace util {
 
 	template <typename _Key, typename _Compare = std::less<_Key>> class map_node {
-		std::shared_mutex mutex_;
+		mutable std::shared_mutex mutex_;
 		std::set<_Key, _Compare> storage_;
 		public:
 			map_node();
 			map_node(const map_node&) = delete;
 			map_node& operator=(const map_node&) = delete;
 			const _Key* put(const _Key&);
-			const _Key* get(const _Key&);
+			const _Key* get(const _Key&) const;
 	};
 
 	template <typename _Key, typename _Compare> map_node<_Key, _Compare>::map_node() {
 	}
 
 
-	template <typename _Key, typename _Compare> const _Key* map_node< _Key, _Compare>::put(const _Key& key) {
+	template <typename _Key, typename _Compare> 
+	const _Key* map_node< _Key, _Compare>::put(const _Key& key) {
 		const std::lock_guard<std::shared_mutex> lock(mutex_);
 		storage_.emplace(key);
 		auto found = storage_.find(key);
@@ -36,7 +37,8 @@ namespace util {
 	}
 
 	
-	template <typename _Key, typename _Compare> const _Key* map_node< _Key, _Compare>::get(const _Key& key) {
+	template <typename _Key, typename _Compare> 
+	const _Key* map_node< _Key, _Compare>::get(const _Key& key) const {
 		const std::shared_lock<std::shared_mutex> lock(this->mutex_);
 		const _Key* ptr = nullptr;
 		if (auto found = storage_.find(key); found != storage_.end())
@@ -54,7 +56,7 @@ namespace util {
 		std::size_t hash_buckets;
 		std::vector<element_t> vector_;
 		void initialize();
-		decltype(auto) find_bucket(const _Key&);
+		decltype(auto) find_bucket(const _Key&) const;
 
 	public:
 		concurrent_hash_map();
@@ -62,7 +64,7 @@ namespace util {
 		concurrent_hash_map(const concurrent_hash_map&) = delete;
 		concurrent_hash_map& operator=(const concurrent_hash_map&) = delete;
 		const _Key* put(const _Key&);
-		const _Key* get(const _Key&);
+		const _Key* get(const _Key&) const;
 	};
 
 	template <
@@ -102,7 +104,7 @@ namespace util {
 		typename _Compare,
 		typename _Hash
 	>
-	decltype(auto) concurrent_hash_map<_Key, _Compare, _Hash>::find_bucket(const _Key& key) {
+	decltype(auto) concurrent_hash_map<_Key, _Compare, _Hash>::find_bucket(const _Key& key) const {
 		auto backet = static_cast<int>(_Hash{}(key) % hash_buckets);
 		decltype(auto) ptr = vector_[std::abs(backet)];
 		return ptr;
@@ -123,7 +125,7 @@ namespace util {
 		typename _Compare,
 		typename _Hash
 	>
-	const _Key* concurrent_hash_map<_Key, _Compare, _Hash>::get(const _Key& key) {
+	const _Key* concurrent_hash_map<_Key, _Compare, _Hash>::get(const _Key& key) const {
 		decltype(auto) ptr = find_bucket(key);
 		return ptr.get()->get(key);
 	}

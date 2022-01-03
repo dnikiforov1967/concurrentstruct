@@ -9,6 +9,7 @@ Author D.Nikiforov, 12.2021
 
 #include <set>
 #include <vector>
+#include <memory>
 #include <shared_mutex>
 
 namespace util {
@@ -75,9 +76,7 @@ namespace util {
 	void concurrent_hash_map<_Key, _Compare, _Hash>::initialize() {
 		map_node<_Key, _Compare> *node_ = nullptr;
 		for (auto i = 0; i < hash_buckets; i++) {
-			node_ = new map_node<_Key, _Compare>();
-			auto uptr_ = element_t(node_);
-			vector_.push_back(std::move(uptr_));
+			vector_.push_back(std::make_unique<map_node<_Key, _Compare>>());
 		}
 	}
 
